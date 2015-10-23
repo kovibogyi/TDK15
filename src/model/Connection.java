@@ -10,7 +10,9 @@ public interface Connection {
   String SQLEMPLOYEES=
     "SELECT EMPLOYEE_ID AS empId, FIRST_NAME || ' ' || LAST_NAME AS empName, salary AS empSalary, DEPARTMENT_ID AS depId, MANAGER_ID AS managerId\n" +
     "FROM EMPLOYEES";
-  
+  String SQLDEPARTMENT=
+    "SELECT DEPARTMENT_ID AS depId, DEPARTMENT_NAME AS depName, MANAGER_ID AS depManagerId\n" +
+    "from Departments";
   
   void open();
 

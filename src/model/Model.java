@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -24,15 +25,15 @@ public class Model implements Connection {
   private File empFile=new File("./data/employees.csv");
   
   public Model() {
-    //open();
-    //employeesWrite();
-    //close();
+//    open();
+//    employeesWrite();
+//    close();
     empList=employeesRead();
 
     //x();
     //PT
     //pt1();
-    pt1r();
+//    pt1r();
   }
   
   private void x() {
@@ -214,33 +215,7 @@ public class Model implements Connection {
     return n!=empList.size() ? 
             (empList.get(n).getEmpSalary() > x ? true : pt2r(x,n+1) ) 
             : false;
-  }
-  
-  /**
-   * 
-   * feltétel metódusként, returnType = boolean, args.length = 1 és arg[0].class = Employee.class
-   * 
-   * @param m a feltétel, statikus metódus
-   * @return teljesül e m feltétel
-   * @throws IllegalAccessException
-   * @throws IllegalArgumentException
-   * @throws InvocationTargetException 
-   */
-  public boolean pt2ig(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    
-    if (!m.getReturnType().equals(Boolean.TYPE) || 
-            m.getParameters().length != 1 || 
-            !m.getParameterTypes()[0].equals(Employee.class)) 
-      throw new RuntimeException("Hiba");
-    
-    int i = 0;    
-    while (i<empList.size() && (boolean)m.invoke(null, empList.get(i))) 
-      i++;      
-    return i<empList.size();    
-    
-    
-  }
-  
+  }  
    
   /**
    * kiválasztás: ki keres x-et?
@@ -349,6 +324,88 @@ public class Model implements Connection {
   
   private int pt6r(int n, int max) {
     return n == empList.size() ? max : (empList.get(n).getEmpSalary() > empList.get(max).getEmpSalary() ? pt6r(n+1,n) : pt6r(n+1,max) );
+  }
+  
+
+  
+  /**
+   * le masolja az emplistet es vegrehatja m metodust, minden elemen
+   * 
+   * @param m a statikus metódus amit minden elemen végrehajt, returnType = Employee.class, args.length = 1 és arg[0].class = Employee.class 
+   * @return teljesül e m feltétel
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException 
+   */
+  
+  public ObservableList<Employee> pt7i(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (!m.getReturnType().equals(Employee.class) || 
+            m.getParameters().length != 1 || 
+            !m.getParameterTypes()[0].equals(Employee.class)) 
+      throw new RuntimeException("Hiba");    
+    List<Employee> raisedSalaryEmps = new ArrayList<>();
+    for (Employee e : empList)
+      raisedSalaryEmps.add((Employee)m.invoke(null, e));
+    return FXCollections.observableArrayList(raisedSalaryEmps);
+  }
+  
+  /**
+   * le masolja az emplistet es vegrehatja m metodust, minden elemen
+   * 
+   * @param m a statikus metódus amit minden elemen végrehajt, returnType = Employee.class, args.length = 1 és arg[0].class = Employee.class 
+   * @return teljesül e m feltétel
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException 
+   */  
+  public ObservableList<Employee> pt7r(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (!m.getReturnType().equals(Employee.class) || 
+            m.getParameters().length != 1 || 
+            !m.getParameterTypes()[0].equals(Employee.class)) 
+      throw new RuntimeException("Hiba");    
+    List<Employee> raisedSalaryEmps = new ArrayList<>();
+    return pt7r(m,0,raisedSalaryEmps);
+    
+  }
+
+  private ObservableList<Employee> pt7r(Method m, int n, List <Employee> raisedSalaryEmps) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (n==empList.size()) return FXCollections.observableArrayList(raisedSalaryEmps);
+    Employee emp = (Employee)m.invoke(null, empList.get(n));
+    raisedSalaryEmps.add(emp);
+    return pt7r(m,n+1,raisedSalaryEmps);    
+  }
+  
+  /**
+   * kivalogatas: x dept koduak uj listaba
+   * 
+   * @param x dept kod
+   */
+  public ObservableList<Employee> pt8i(int x) {
+    List <Employee> deptEmps = new ArrayList<>();
+    for (Employee e : empList) 
+      if (e.getDepId() == x) deptEmps.add(e);
+    return FXCollections.observableArrayList(deptEmps);    
+  }
+  
+/**
+   * kivalogatas: x dept koduak uj listaba
+   * 
+   * @param x dept kod
+   */
+  
+  public ObservableList<Employee> pt8r(int x) {
+    List <Employee> deptEmps = new ArrayList<>();
+    return pt8r(x,0,deptEmps);
+  }
+
+  private ObservableList<Employee> pt8r(int x, int n, List<Employee> deptEmps) {
+    if (n == empList.size()) return FXCollections.observableArrayList(deptEmps);
+    if (empList.get(n).getDepId() == x) deptEmps.add(empList.get(n));
+    return pt8r(x,n+1,deptEmps);
+  }
+  
+  public EmpListTuple pt9i() {
+    return null;
   }
   
   

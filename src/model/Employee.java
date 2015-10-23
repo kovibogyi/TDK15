@@ -21,6 +21,7 @@ public class Employee {
   }
   
   
+  
   public String toString() {
     //return empName;
     return toCSVString();
@@ -49,5 +50,18 @@ public class Employee {
   public int getManagerId() {
     return managerId;
   }
+  
+  /**
+   * megnöveli a fizetest
+   * (masolas tetelhez)
+   * 
+   * @param e a forrás empl.
+   * @return egy új megemelt fiz.-ű dolgozó
+   */
+  
+  public static Employee raiseSalary(Employee e) {
+    return new Employee(e.empId, e.empName, (int)(e.empSalary*1.1), e.depId, e.managerId);
+  }
+  
   
 }

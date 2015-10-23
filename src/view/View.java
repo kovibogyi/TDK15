@@ -21,6 +21,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -155,7 +156,22 @@ public class View extends Application {
     
     Tab tab2 = new Tab("Tab2",gp);
     
-    center.getTabs().addAll(tab1,tab2);
+    TilePane tp = new TilePane();
+    Tab tab3 = new Tab("Tab3",tp);
+    try {
+      ListView lvEmpsRSI = new ListView(model.pt7i(Employee.class.getDeclaredMethod("raiseSalary", Employee.class))); //listview empls raised salary iterative
+      ListView lvEmpsRSR = new ListView(model.pt7i(Employee.class.getDeclaredMethod("raiseSalary", Employee.class))); // -||-                        recursive   
+      tp.getChildren().addAll(lvEmpsRSI,lvEmpsRSR);
+      
+    } catch (Exception e) {}
+    
+    
+    
+    ListView<Employee> lvEmpSelI = new ListView<>(model.pt8i(100));
+    ListView<Employee> lvEmpSelR = new ListView<>(model.pt8r(100));
+    TilePane tp2 = new TilePane(lvEmpSelI,lvEmpSelR);
+    Tab tab4 = new Tab("Tab4",tp2);
+    center.getTabs().addAll(tab1,tab2,tab3,tab4);
   }
   
 }
