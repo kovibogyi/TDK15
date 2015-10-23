@@ -160,7 +160,11 @@ public class Model implements Connection {
     return FXCollections.observableArrayList(empList);
   }
   
-  //Összes fizetés megszámolása
+  
+  /**
+   * Összes fizetés megszámolása
+   * @return 
+   */
   
   public int pt1i() {
     int sum = 0;
@@ -168,7 +172,11 @@ public class Model implements Connection {
       sum += emp.getEmpSalary();
     return sum;
   }
-  
+
+   /**
+   * Összes fizetés megszámolása
+   * @return 
+   */  
   public int pt1r() {    
     return pt1r(0);
   }
@@ -178,7 +186,13 @@ public class Model implements Connection {
             empList.get(n).getEmpSalary() : empList.get(n).getEmpSalary()+pt1r(n+1);
   }
   
-  //eldöntés: van e fizetés > x?
+  
+  /**
+   * eldöntés: van e fizetés > x?
+   * 
+   * @param x
+   * @return 
+   */
   
   public boolean pt2i(int x) {    
     int i = 0;    
@@ -186,7 +200,12 @@ public class Model implements Connection {
       i++;      
     return i<empList.size();
   }
-  
+  /**
+   * eldöntés: van e fizetés > x?
+   * 
+   * @param x
+   * @return 
+   */  
   public boolean pt2r(int x) {
     return pt2r(x,0);
   }
@@ -222,7 +241,13 @@ public class Model implements Connection {
     
   }
   
-  //kiválasztás: ki keres x-et?
+   
+  /**
+   * kiválasztás: ki keres x-et?
+   * 
+   * @param x
+   * @return 
+   */
   public Employee pt3i(int x) {
     int i = 0;
     while (i<empList.size() && empList.get(i).getEmpSalary() != x) 
@@ -230,6 +255,12 @@ public class Model implements Connection {
     return i==empList.size() ? null : empList.get(i);
   }  
   
+  /**
+   * kiválasztás: ki keres x-et?
+   * 
+   * @param x
+   * @return 
+   */  
   public Employee pt3r(int x) {
     return pt3r(x,0);        
   }
@@ -240,6 +271,85 @@ public class Model implements Connection {
             : null;
   }  
   
+  
+  
+  /**
+   * keresés : első alkalmazott, ahol dept code = x
+   * 
+   * @param x
+   * @return 
+   */
+  public Employee pt4i(int x) {
+    int i = 0;
+    while (i<empList.size() && empList.get(i).getDepId() != x)
+      i++;
+    return i<empList.size() ? empList.get(i) : null;
+  }
+  /**
+   * keresés : első alkalmazott, ahol dept code = x
+   * 
+   * @param x
+   * @return 
+   */  
+  public Employee pt4r(int x) {
+    return pt4r(x,0);
+  }
+  
+  private Employee pt4r(int x, int n) {
+    return n < empList.size() ? 
+            empList.get(n).getDepId() == x ? empList.get(n) : pt4r(x,n+1) 
+            : null;    
+  }
+  
+  
+  
+  /**
+   * Megszámolás: ahol depId = x
+   * @param x
+   * @return 
+   */
+  public int pt5i(int x) {
+    int members = 0;
+    for (Employee e : empList)
+      if (e.getDepId() == x) members++;
+    return members;    
+  }
+
+  /**
+   * Megszámolás: ahol depId = x
+   * @param x
+   * @return 
+   */  
+  public int pt5r(int x) {
+    return pt5r(x,0);
+  }
+  
+  private int pt5r(int x, int n) {
+    return n==empList.size() ? 0 : (empList.get(n).getDepId() == x ? 1 : 0) + pt5r(x,n+1);
+  }
+  
+  /**
+   * 
+   * @return legmagasabb fizetes indexe
+   */
+  public int pt6i() {
+    int max = 0;
+    for (int i = 1; i < empList.size(); i++) 
+      if (empList.get(i).getEmpSalary()>empList.get(max).getEmpSalary()) max = i;
+    return max;
+  }
+  /**
+   * 
+   * @return legmagasabb fizetes indexe
+   */
+  
+  public int pt6r() {
+    return pt6r(0,0);
+  }
+  
+  private int pt6r(int n, int max) {
+    return n == empList.size() ? max : (empList.get(n).getEmpSalary() > empList.get(max).getEmpSalary() ? pt6r(n+1,n) : pt6r(n+1,max) );
+  }
   
   
   

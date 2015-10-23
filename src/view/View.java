@@ -104,12 +104,12 @@ public class View extends Application {
     Tab tab1 = new Tab("Tab1",lvEmps);       
     
         
-    int lines = 6;
+    int lines = 12;
     
     Text [][] texts = new Text[2][lines];
     GridPane gp = new GridPane();
     for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 6; j++) {
+      for (int j = 0; j < lines; j++) {
         texts[i][j] = new Text();
         
         gp.add(texts[i][j], i, j);
@@ -132,8 +132,26 @@ public class View extends Application {
     texts[0][4].setText("kivalaszt i");
     texts[1][4].setText("" + model.pt3i(4800));
     
-    texts[0][5].setText("kivalaszt i");
+    texts[0][5].setText("kivalaszt r");
     texts[1][5].setText("" + model.pt3r(4800));
+    
+    texts[0][6].setText("kereses i");
+    texts[1][6].setText(""+model.pt4i(100));
+    
+    texts[0][7].setText("kereses r");
+    texts[1][7].setText(""+model.pt4r(100));
+    
+    texts[0][8].setText("megszamolas i");
+    texts[1][8].setText(""+model.pt5i(100));
+    
+    texts[0][9].setText("megszamolas r");
+    texts[1][9].setText(""+model.pt5r(100));
+    
+    texts[0][10].setText("max kiv i");
+    texts[1][10].setText("" + model.pt6i());
+    
+    texts[0][11].setText("max kiv r");
+    texts[1][11].setText("" + model.pt6r());    
     
     Tab tab2 = new Tab("Tab2",gp);
     
