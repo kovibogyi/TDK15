@@ -1,0 +1,224 @@
+package adatbazis.adatbazis5;
+
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JCheckBox;
+import javax.swing.table.DefaultTableModel;
+
+interface AdatbazisKapcsolat {
+  String URL="jdbc:oracle:thin:@localhost:1521:xe";
+  String USER="HR";
+  String PASSWORD="hr";
+  String DRIVER="oracle.jdbc.driver.OracleDriver";
+}
+
+public class Adatbazis5 extends javax.swing.JFrame {
+  private ArrayList<String> aktuálisRészlegLista=new ArrayList<String>();
+
+    /** Creates new form LekérdezőAblak2 */
+    public Adatbazis5() {
+        initComponents();
+        final String[] oszlopok={"Név", "Részleg", "Fizetés"};
+//        final DefaultTableModel dtm=new DefaultTableModel(oszlopok, 3);
+//        tblDolgozók.setModel(dtm);
+        ArrayList<String> részlegLista=részlegekListája();
+        //for (String string : részlegLista)
+        //  System.out.println(string);
+        pnRészlegek.setLayout(new GridLayout(részlegLista.size(), 1));
+        for (String részleg : részlegLista) {
+          JCheckBox cb=new JCheckBox(részleg);
+          pnRészlegek.add(cb);
+          cb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              //System.out.println(((JCheckBox)e.getSource()).getText());
+              //System.out.println(((JCheckBox)e.getSource()).isSelected());
+              if(((JCheckBox)e.getSource()).isSelected())
+                aktuálisRészlegLista.add(((JCheckBox)e.getSource()).getText());
+              else
+                aktuálisRészlegLista.remove(((JCheckBox)e.getSource()).getText());
+              //System.out.println(aktuálisRészlegLista);
+
+              String where="";
+              if(!aktuálisRészlegLista.isEmpty()) {
+                for (String részleg : aktuálisRészlegLista)
+                  where+="DEPARTMENT_NAME = '"+részleg+"' OR ";
+                where=where.substring(0, where.length()-4);
+              }
+              //System.out.println("where: "+where);
+              tblDolgozók.setModel(new DefaultTableModel()); //null);
+              DefaultTableModel dtm=new DefaultTableModel(oszlopok, 0);
+              int db=0;
+              try {
+                Class.forName(AdatbazisKapcsolat.DRIVER);
+                Connection kapcsolat=DriverManager.getConnection(
+                  AdatbazisKapcsolat.URL, AdatbazisKapcsolat.USER,
+                  AdatbazisKapcsolat.PASSWORD);
+                Statement s=kapcsolat.createStatement();
+                if(!where.equals("")) {
+                  ResultSet rs=s.executeQuery(
+                    "SELECT FIRST_NAME || ' ' || LAST_NAME AS NÉV, DEPARTMENT_NAME AS RÉSZLEG, SALARY AS FIZETÉS "+
+                    "FROM EMPLOYEES E, DEPARTMENTS D "+
+                    "WHERE E.DEPARTMENT_ID = D.DEPARTMENT_ID"+
+                    ((!where.equals(""))?(" AND ("+where+")"):"")+" ORDER BY NÉV");
+                  //dtm//=new DefaultTableModel();
+                  while(rs.next()) {
+                    //System.out.println(rs.getString("NÉV")+", "+rs.getString("FIZETÉS"));
+                    dtm.addRow(new String[]
+                      {rs.getString("NÉV"), rs.getString("RÉSZLEG"), rs.getString("FIZETÉS")});
+                    db++;
+                  }
+                }
+                tblDolgozók.setModel(dtm);
+                kapcsolat.close();
+                lbDb.setText(db+" fő ("+dtm.getRowCount()+" fő)");
+              }
+              catch(Exception e2) {
+                e2.printStackTrace();
+              }
+            }
+          });
+        }        
+    }
+
+    private ArrayList<String> részlegekListája() {
+      ArrayList<String> lista=null;
+      try {
+        Class.forName(AdatbazisKapcsolat.DRIVER);
+        Connection kapcsolat=DriverManager.getConnection(
+          AdatbazisKapcsolat.URL, AdatbazisKapcsolat.USER,
+          AdatbazisKapcsolat.PASSWORD);
+        Statement s=kapcsolat.createStatement();
+        ResultSet rs=s.executeQuery(
+          "SELECT DEPARTMENT_NAME AS RÉSZLEG "+
+          "FROM DEPARTMENTS "+
+          "WHERE MANAGER_ID>0 "+
+          "ORDER BY RÉSZLEG");
+        lista=new ArrayList<String>();
+        while(rs.next())
+          lista.add(rs.getString("RÉSZLEG"));
+          //System.out.println(rs.getString("RÉSZLEG")); //(1));
+        kapcsolat.close();
+      }
+      catch (Exception ex) {
+        Logger.getLogger(Adatbazis5.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      return lista;
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jSplitPane1 = new javax.swing.JSplitPane();
+        pnRészlegek = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblDolgozók = new javax.swing.JTable();
+        lbDb = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Részlegek dolgozói");
+
+        javax.swing.GroupLayout pnRészlegekLayout = new javax.swing.GroupLayout(pnRészlegek);
+        pnRészlegek.setLayout(pnRészlegekLayout);
+        pnRészlegekLayout.setHorizontalGroup(
+            pnRészlegekLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        pnRészlegekLayout.setVerticalGroup(
+            pnRészlegekLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 445, Short.MAX_VALUE)
+        );
+
+        jSplitPane1.setLeftComponent(pnRészlegek);
+
+        tblDolgozók.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(tblDolgozók);
+
+        lbDb.setText("0 fő (0 fő)");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbDb)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(124, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(32, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lbDb)
+                .addGap(25, 25, 25))
+        );
+
+        jSplitPane1.setRightComponent(jPanel2);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSplitPane1)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSplitPane1)
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    /**
+    * @param args the command line arguments
+    */
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Adatbazis5().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLabel lbDb;
+    private javax.swing.JPanel pnRészlegek;
+    private javax.swing.JTable tblDolgozók;
+    // End of variables declaration//GEN-END:variables
+
+}
