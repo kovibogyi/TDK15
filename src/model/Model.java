@@ -462,10 +462,32 @@ public class Model implements Connection {
     return pt8r(x,n+1,deptEmps);
   }
   
-  public EmpListTuple pt9i() {
-    return null;
+  /**
+   * szétválogatás: pivot fizetés alattiakat és felettieket külön
+   * @param x pivot
+   * @return EmplistTuple (list1 - alatta, list2 felette)
+   */
+  
+  public EmpListTuple pt9i(int x) {
+    ArrayList<Employee> 
+            list1 = new ArrayList<>(),
+            list2 = new ArrayList<>();
+    for (Employee e : empList) 
+      if (e.getEmpSalary() <= x) list1.add(e);
+      else list2.add(e);      
+    return new EmpListTuple(list1, list2);          
   }
   
+  /**
+   * szétválogatás: pivot fizetés alattiakat és felettieket külön
+   * @param x pivot
+   * @return EmplistTuple (list1 - alatta, list2 felette)
+   */
+  
+  public EmpListTuple pt9r(int x) {
+    EmpListTuple elt = new EmpListTuple();
+    return pt9r(int x,0, )
+  }
   
   
 }
