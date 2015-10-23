@@ -20,8 +20,13 @@ public class Employee {
     return "empId;empName;empSalary;depId;managerId";
   }
   
-  @Override
+  
   public String toString() {
+    //return empName;
+    return toCSVString();
+  }
+  
+  public String toCSVString() {
     return empId+";"+empName+";"+empSalary+";"+depId+";"+managerId;
   }
 
