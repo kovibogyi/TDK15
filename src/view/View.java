@@ -171,7 +171,41 @@ public class View extends Application {
     ListView<Employee> lvEmpSelR = new ListView<>(model.pt8r(100));
     TilePane tp2 = new TilePane(lvEmpSelI,lvEmpSelR);
     Tab tab4 = new Tab("Tab4",tp2);
-    center.getTabs().addAll(tab1,tab2,tab3,tab4);
+    
+    int avg = model.pt1i()/model.getEmployeeList().size();
+    
+    EmpListTuple el1 = model.pt9i(avg);
+    EmpListTuple el2 = model.pt9r(avg);        
+    
+    GridPane gp2 = new GridPane();
+    
+    ListView<Employee> lvEmppt9i1 = new ListView<>(el1.getList1O());
+    ListView<Employee> lvEmppt9i2 = new ListView<>(el1.getList2O());
+    
+    lvEmppt9i1.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    lvEmppt9i2.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    
+    ListView<Employee> lvEmppt9r1 = new ListView<>(el2.getList1O());
+    ListView<Employee> lvEmppt9r2 = new ListView<>(el2.getList2O());
+    
+    lvEmppt9r1.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    lvEmppt9r2.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+                
+    gp2.add(lvEmppt9i1, 0, 0);
+    gp2.add(lvEmppt9i2, 0, 1);
+    gp2.add(lvEmppt9r1, 1, 0);
+    gp2.add(lvEmppt9r2, 1, 1);        
+    
+    Tab tab5 = new Tab("Tab5",gp2);
+    
+    //8-as es 9-es tetellel kepzett listak metszete (10-es)
+    ListView lvAvgAlattEsShippingI = new ListView(model.pt10i(model.pt8i(model.getDeptsAndIDs().get("Shipping")),el1.getList1O()));
+    ListView lvAvgAlattEsShippingR = new ListView(model.pt10r(model.pt8r(model.getDeptsAndIDs().get("Shipping")),el2.getList1O()));
+    TilePane tp3 = new TilePane(lvAvgAlattEsShippingI,lvAvgAlattEsShippingR);
+    
+    Tab tab6 = new Tab("Tab6",tp3);
+    
+    center.getTabs().addAll(tab1,tab2,tab3,tab4,tab5,tab6);
   }
   
 }

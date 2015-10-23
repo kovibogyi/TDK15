@@ -13,8 +13,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -24,6 +28,7 @@ public class Model implements Connection {
   private java.sql.Connection connection=null;
   private File empFile=new File("./data/employees.csv");
   private File depFile=new File("./data/departments.csv");
+  private Map<String,Integer> deptsAndIDs = new HashMap<>();
   
   public Model() {
     open();
@@ -34,8 +39,8 @@ public class Model implements Connection {
     empList=employeesRead();
     depList=departmentsRead();
     
-    
-      
+    for (Department d : depList)
+      deptsAndIDs.put(d.getDepName(), d.getDepId());
 
     //x();      //1000x meghívja az iteratívot
     //PT        
@@ -219,6 +224,12 @@ public class Model implements Connection {
   public ObservableList<Department> getDeptList() {
     return FXCollections.observableArrayList(depList);
   }
+
+  public Map<String, Integer> getDeptsAndIDs() {
+    return deptsAndIDs;
+  }
+  
+  
   
   /**
    * Összes fizetés megszámolása
@@ -486,8 +497,68 @@ public class Model implements Connection {
   
   public EmpListTuple pt9r(int x) {
     EmpListTuple elt = new EmpListTuple();
-    return pt9r(int x,0, )
+    return pt9r(x,0, elt);
   }
+
+  private EmpListTuple pt9r(int x, int n, EmpListTuple elt) {
+    if (n==empList.size()) return elt;
+    if (empList.get(n).getEmpSalary() <= x) elt.getList1().add(empList.get(n));
+    else elt.getList2().add(empList.get(n));
+    return pt9r(x, n+1, elt);
+  }
+  
+  /**
+   * metszet
+   * 
+   * @param list1
+   * @param list2
+   * @return list1 és 2 metszete
+   */
+  public ObservableList<Employee> pt10i(ObservableList<Employee> list1, ObservableList<Employee> list2) {
+    Set<Employee> temp = new HashSet<>();
+    for (int i = 0; i < list1.size(); i++) {
+      int j = 0;
+      while (j<list2.size() && list1.get(i) != list2.get(j))
+        j++;
+      if (j<list2.size())
+        temp.add(list1.get(i));
+    }
+    return FXCollections.observableArrayList(temp);    
+  }
+  
+  /**
+   * metszet
+   * 
+   * @param list1
+   * @param list2
+   * @return list1 és 2 metszete
+   */  
+  public ObservableList<Employee> pt10r(ObservableList<Employee> list1, ObservableList<Employee> list2) {
+    Set<Employee> temp = new HashSet<>();
+    return pt10r(list1,list2,0,0,temp);
+  }
+
+  /**
+   * 
+   * @param list1
+   * @param list2
+   * @param n egyik listában i-nél
+   * @param o másikban o-nál tart
+   * @param temp a metszet
+   * @return 
+   */
+  private ObservableList<Employee> pt10r(ObservableList<Employee> list1, ObservableList<Employee> list2, int n, int o, Set<Employee> temp) {
+    if (n==list1.size()) return FXCollections.observableArrayList(temp);
+    if (o==list2.size()) return pt10r(list1,list2,n+1,0,temp);
+    if (list1.get(n).equals(list2.get(o))) {
+      temp.add(list1.get(n));
+      return pt10r(list1,list2,n+1,0,temp);
+    } else return pt10r(list1,list2,n,o+1,temp);
+    
+    
+  }
+  
+  
   
   
 }
