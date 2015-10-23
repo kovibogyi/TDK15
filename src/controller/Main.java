@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import model.Department;
 import model.Employee;
 import model.Model;
 import view.View;
@@ -17,13 +18,18 @@ public class Main {
       System.out.println(e);
     }
     
-    try {
-      Method toDo = Employee.class.getDeclaredMethod("raiseSalary", Employee.class);    
-      System.out.println(model.pt7i(toDo));
-      System.out.println(model.pt7r(toDo));
-    } catch (Exception e) {}
+    for (Department d : model.getDeptList()) {
+      System.out.println(d);
+    }
     
-    Application.launch(View.class,args);
+    
+//    try {
+//      Method toDo = Employee.class.getDeclaredMethod("raiseSalary", Employee.class);    
+//      System.out.println(model.pt7i(toDo));
+//      System.out.println(model.pt7r(toDo));
+//    } catch (Exception e) {}
+//    
+//    Application.launch(View.class,args);
     
     
   }

@@ -23,17 +23,24 @@ public class Model implements Connection {
   private ArrayList<Department> depList=new ArrayList<>();
   private java.sql.Connection connection=null;
   private File empFile=new File("./data/employees.csv");
+  private File depFile=new File("./data/departments.csv");
   
   public Model() {
-//    open();
-//    employeesWrite();
-//    close();
+    open();
+    employeesWrite();       //Kaczuré
+    departmentsWrite();   //Ákosé
+    close();
+    
     empList=employeesRead();
+    depList=departmentsRead();
+    
+    
+      
 
-    //x();
-    //PT
-    //pt1();
-//    pt1r();
+    //x();      //1000x meghívja az iteratívot
+    //PT        
+    //pt1();    //PT1 iteratív
+//    pt1r();     //PT1 rekurzív
   }
   
   private void x() {
@@ -157,10 +164,61 @@ public class Model implements Connection {
     }
   }
   
+//Departmen beolvasása Ákos------------
+  
+  
+    //Departments fájlba írás
+   private void departmentsWrite() {
+    ResultSet rsDep=query(SQLDEPARTMENT);
+    try {
+      while(rsDep.next()) {
+        int depId=rsDep.getInt("depId");
+        String depName=rsDep.getString("depName");
+        int depManagerId=rsDep.getInt("depManagerId");       
+        depList.add(new Department(depId, depName, depManagerId));
+      }               
+      BufferedWriter bwDep=new BufferedWriter(new FileWriter(depFile));
+      bwDep.write(Department.getIdentifiers());
+      bwDep.newLine();
+      for (Department dep : depList) {
+        bwDep.write(dep.toString());
+        bwDep.newLine();
+      }              
+      bwDep.close();
+    }
+    catch(Exception e) {      
+    }    
+  }
+   
+    //Fájlból beolvasás
+    private ArrayList<Department> departmentsRead() {
+    ArrayList<Department> depList=new ArrayList<>();
+    try {
+      BufferedReader brDep=new BufferedReader(new FileReader(depFile));
+      brDep.readLine();
+      String line="";
+      while((line=brDep.readLine())!=null) {
+        String[] splittedLine=line.split(";");
+        int depId=Integer.parseInt(splittedLine[0]);
+        String depName=splittedLine[1];        
+        int depManagerId=Integer.parseInt(splittedLine[2]);
+        depList.add(new Department(depId, depName, depManagerId));
+      }
+      brDep.close();
+    }
+    catch (Exception e) {
+    }
+    
+    return depList;
+  }  
+  
   public ObservableList<Employee> getEmployeeList() {
     return FXCollections.observableArrayList(empList);
   }
   
+  public ObservableList<Department> getDeptList() {
+    return FXCollections.observableArrayList(depList);
+  }
   
   /**
    * Összes fizetés megszámolása
