@@ -21,6 +21,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -155,7 +156,56 @@ public class View extends Application {
     
     Tab tab2 = new Tab("Tab2",gp);
     
-    center.getTabs().addAll(tab1,tab2);
+    TilePane tp = new TilePane();
+    Tab tab3 = new Tab("Tab3",tp);
+    try {
+      ListView lvEmpsRSI = new ListView(model.pt7i(Employee.class.getDeclaredMethod("raiseSalary", Employee.class))); //listview empls raised salary iterative
+      ListView lvEmpsRSR = new ListView(model.pt7i(Employee.class.getDeclaredMethod("raiseSalary", Employee.class))); // -||-                        recursive   
+      tp.getChildren().addAll(lvEmpsRSI,lvEmpsRSR);
+      
+    } catch (Exception e) {}
+    
+    
+    
+    ListView<Employee> lvEmpSelI = new ListView<>(model.pt8i(100));
+    ListView<Employee> lvEmpSelR = new ListView<>(model.pt8r(100));
+    TilePane tp2 = new TilePane(lvEmpSelI,lvEmpSelR);
+    Tab tab4 = new Tab("Tab4",tp2);
+    
+    int avg = model.pt1i()/model.getEmployeeList().size();
+    
+    EmpListTuple el1 = model.pt9i(avg);
+    EmpListTuple el2 = model.pt9r(avg);        
+    
+    GridPane gp2 = new GridPane();
+    
+    ListView<Employee> lvEmppt9i1 = new ListView<>(el1.getList1O());
+    ListView<Employee> lvEmppt9i2 = new ListView<>(el1.getList2O());
+    
+    lvEmppt9i1.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    lvEmppt9i2.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    
+    ListView<Employee> lvEmppt9r1 = new ListView<>(el2.getList1O());
+    ListView<Employee> lvEmppt9r2 = new ListView<>(el2.getList2O());
+    
+    lvEmppt9r1.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+    lvEmppt9r2.prefHeightProperty().bind(gp2.heightProperty().divide(2.0D));
+                
+    gp2.add(lvEmppt9i1, 0, 0);
+    gp2.add(lvEmppt9i2, 0, 1);
+    gp2.add(lvEmppt9r1, 1, 0);
+    gp2.add(lvEmppt9r2, 1, 1);        
+    
+    Tab tab5 = new Tab("Tab5",gp2);
+    
+    //8-as es 9-es tetellel kepzett listak metszete (10-es)
+    ListView lvAvgAlattEsShippingI = new ListView(model.pt10i(model.pt8i(model.getDeptsAndIDs().get("Shipping")),el1.getList1O()));
+    ListView lvAvgAlattEsShippingR = new ListView(model.pt10r(model.pt8r(model.getDeptsAndIDs().get("Shipping")),el2.getList1O()));
+    TilePane tp3 = new TilePane(lvAvgAlattEsShippingI,lvAvgAlattEsShippingR);
+    
+    Tab tab6 = new Tab("Tab6",tp3);
+    
+    center.getTabs().addAll(tab1,tab2,tab3,tab4,tab5,tab6);
   }
   
 }

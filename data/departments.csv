@@ -1,0 +1,28 @@
+depId;depName;depManagerId;
+10;Administration;200
+20;Marketing;201
+30;Purchasing;114
+40;Human Resources;203
+50;Shipping;121
+60;IT;103
+70;Public Relations;204
+80;Sales;145
+90;Executive;100
+100;Finance;108
+110;Accounting;205
+120;Treasury;0
+130;Corporate Tax;0
+140;Control And Credit;0
+150;Shareholder Services;0
+160;Benefits;0
+170;Manufacturing;0
+180;Construction;0
+190;Contracting;0
+200;Operations;0
+210;IT Support;0
+220;NOC;0
+230;IT Helpdesk;0
+240;Government Sales;0
+250;Retail Sales;0
+260;Recruiting;0
+270;Payroll;0

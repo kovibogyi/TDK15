@@ -13,7 +13,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -22,17 +27,25 @@ public class Model implements Connection {
   private ArrayList<Department> depList=new ArrayList<>();
   private java.sql.Connection connection=null;
   private File empFile=new File("./data/employees.csv");
+  private File depFile=new File("./data/departments.csv");
+  private Map<String,Integer> deptsAndIDs = new HashMap<>();
   
   public Model() {
-    //open();
-    //employeesWrite();
-    //close();
+    open();
+    employeesWrite();       //Kaczuré
+    departmentsWrite();   //Ákosé
+    close();
+    
     empList=employeesRead();
+    depList=departmentsRead();
+    
+    for (Department d : depList)
+      deptsAndIDs.put(d.getDepName(), d.getDepId());
 
-    //x();
-    //PT
-    //pt1();
-    pt1r();
+    //x();      //1000x meghívja az iteratívot
+    //PT        
+    //pt1();    //PT1 iteratív
+//    pt1r();     //PT1 rekurzív
   }
   
   private void x() {
@@ -156,9 +169,66 @@ public class Model implements Connection {
     }
   }
   
+//Departmen beolvasása Ákos------------
+  
+  
+    //Departments fájlba írás
+   private void departmentsWrite() {
+    ResultSet rsDep=query(SQLDEPARTMENT);
+    try {
+      while(rsDep.next()) {
+        int depId=rsDep.getInt("depId");
+        String depName=rsDep.getString("depName");
+        int depManagerId=rsDep.getInt("depManagerId");       
+        depList.add(new Department(depId, depName, depManagerId));
+      }               
+      BufferedWriter bwDep=new BufferedWriter(new FileWriter(depFile));
+      bwDep.write(Department.getIdentifiers());
+      bwDep.newLine();
+      for (Department dep : depList) {
+        bwDep.write(dep.toString());
+        bwDep.newLine();
+      }              
+      bwDep.close();
+    }
+    catch(Exception e) {      
+    }    
+  }
+   
+    //Fájlból beolvasás
+    private ArrayList<Department> departmentsRead() {
+    ArrayList<Department> depList=new ArrayList<>();
+    try {
+      BufferedReader brDep=new BufferedReader(new FileReader(depFile));
+      brDep.readLine();
+      String line="";
+      while((line=brDep.readLine())!=null) {
+        String[] splittedLine=line.split(";");
+        int depId=Integer.parseInt(splittedLine[0]);
+        String depName=splittedLine[1];        
+        int depManagerId=Integer.parseInt(splittedLine[2]);
+        depList.add(new Department(depId, depName, depManagerId));
+      }
+      brDep.close();
+    }
+    catch (Exception e) {
+    }
+    
+    return depList;
+  }  
+  
   public ObservableList<Employee> getEmployeeList() {
     return FXCollections.observableArrayList(empList);
   }
+  
+  public ObservableList<Department> getDeptList() {
+    return FXCollections.observableArrayList(depList);
+  }
+
+  public Map<String, Integer> getDeptsAndIDs() {
+    return deptsAndIDs;
+  }
+  
   
   
   /**
@@ -214,33 +284,7 @@ public class Model implements Connection {
     return n!=empList.size() ? 
             (empList.get(n).getEmpSalary() > x ? true : pt2r(x,n+1) ) 
             : false;
-  }
-  
-  /**
-   * 
-   * feltétel metódusként, returnType = boolean, args.length = 1 és arg[0].class = Employee.class
-   * 
-   * @param m a feltétel, statikus metódus
-   * @return teljesül e m feltétel
-   * @throws IllegalAccessException
-   * @throws IllegalArgumentException
-   * @throws InvocationTargetException 
-   */
-  public boolean pt2ig(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    
-    if (!m.getReturnType().equals(Boolean.TYPE) || 
-            m.getParameters().length != 1 || 
-            !m.getParameterTypes()[0].equals(Employee.class)) 
-      throw new RuntimeException("Hiba");
-    
-    int i = 0;    
-    while (i<empList.size() && (boolean)m.invoke(null, empList.get(i))) 
-      i++;      
-    return i<empList.size();    
-    
-    
-  }
-  
+  }  
    
   /**
    * kiválasztás: ki keres x-et?
@@ -350,6 +394,170 @@ public class Model implements Connection {
   private int pt6r(int n, int max) {
     return n == empList.size() ? max : (empList.get(n).getEmpSalary() > empList.get(max).getEmpSalary() ? pt6r(n+1,n) : pt6r(n+1,max) );
   }
+  
+
+  
+  /**
+   * le masolja az emplistet es vegrehatja m metodust, minden elemen
+   * 
+   * @param m a statikus metódus amit minden elemen végrehajt, returnType = Employee.class, args.length = 1 és arg[0].class = Employee.class 
+   * @return teljesül e m feltétel
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException 
+   */
+  
+  public ObservableList<Employee> pt7i(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (!m.getReturnType().equals(Employee.class) || 
+            m.getParameters().length != 1 || 
+            !m.getParameterTypes()[0].equals(Employee.class)) 
+      throw new RuntimeException("Hiba");    
+    List<Employee> raisedSalaryEmps = new ArrayList<>();
+    for (Employee e : empList)
+      raisedSalaryEmps.add((Employee)m.invoke(null, e));
+    return FXCollections.observableArrayList(raisedSalaryEmps);
+  }
+  
+  /**
+   * le masolja az emplistet es vegrehatja m metodust, minden elemen
+   * 
+   * @param m a statikus metódus amit minden elemen végrehajt, returnType = Employee.class, args.length = 1 és arg[0].class = Employee.class 
+   * @return teljesül e m feltétel
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException 
+   */  
+  public ObservableList<Employee> pt7r(Method m) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (!m.getReturnType().equals(Employee.class) || 
+            m.getParameters().length != 1 || 
+            !m.getParameterTypes()[0].equals(Employee.class)) 
+      throw new RuntimeException("Hiba");    
+    List<Employee> raisedSalaryEmps = new ArrayList<>();
+    return pt7r(m,0,raisedSalaryEmps);
+    
+  }
+
+  private ObservableList<Employee> pt7r(Method m, int n, List <Employee> raisedSalaryEmps) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    if (n==empList.size()) return FXCollections.observableArrayList(raisedSalaryEmps);
+    Employee emp = (Employee)m.invoke(null, empList.get(n));
+    raisedSalaryEmps.add(emp);
+    return pt7r(m,n+1,raisedSalaryEmps);    
+  }
+  
+  /**
+   * kivalogatas: x dept koduak uj listaba
+   * 
+   * @param x dept kod
+   */
+  public ObservableList<Employee> pt8i(int x) {
+    List <Employee> deptEmps = new ArrayList<>();
+    for (Employee e : empList) 
+      if (e.getDepId() == x) deptEmps.add(e);
+    return FXCollections.observableArrayList(deptEmps);    
+  }
+  
+/**
+   * kivalogatas: x dept koduak uj listaba
+   * 
+   * @param x dept kod
+   */
+  
+  public ObservableList<Employee> pt8r(int x) {
+    List <Employee> deptEmps = new ArrayList<>();
+    return pt8r(x,0,deptEmps);
+  }
+
+  private ObservableList<Employee> pt8r(int x, int n, List<Employee> deptEmps) {
+    if (n == empList.size()) return FXCollections.observableArrayList(deptEmps);
+    if (empList.get(n).getDepId() == x) deptEmps.add(empList.get(n));
+    return pt8r(x,n+1,deptEmps);
+  }
+  
+  /**
+   * szétválogatás: pivot fizetés alattiakat és felettieket külön
+   * @param x pivot
+   * @return EmplistTuple (list1 - alatta, list2 felette)
+   */
+  
+  public EmpListTuple pt9i(int x) {
+    ArrayList<Employee> 
+            list1 = new ArrayList<>(),
+            list2 = new ArrayList<>();
+    for (Employee e : empList) 
+      if (e.getEmpSalary() <= x) list1.add(e);
+      else list2.add(e);      
+    return new EmpListTuple(list1, list2);          
+  }
+  
+  /**
+   * szétválogatás: pivot fizetés alattiakat és felettieket külön
+   * @param x pivot
+   * @return EmplistTuple (list1 - alatta, list2 felette)
+   */
+  
+  public EmpListTuple pt9r(int x) {
+    EmpListTuple elt = new EmpListTuple();
+    return pt9r(x,0, elt);
+  }
+
+  private EmpListTuple pt9r(int x, int n, EmpListTuple elt) {
+    if (n==empList.size()) return elt;
+    if (empList.get(n).getEmpSalary() <= x) elt.getList1().add(empList.get(n));
+    else elt.getList2().add(empList.get(n));
+    return pt9r(x, n+1, elt);
+  }
+  
+  /**
+   * metszet
+   * 
+   * @param list1
+   * @param list2
+   * @return list1 és 2 metszete
+   */
+  public ObservableList<Employee> pt10i(ObservableList<Employee> list1, ObservableList<Employee> list2) {
+    Set<Employee> temp = new HashSet<>();
+    for (int i = 0; i < list1.size(); i++) {
+      int j = 0;
+      while (j<list2.size() && list1.get(i) != list2.get(j))
+        j++;
+      if (j<list2.size())
+        temp.add(list1.get(i));
+    }
+    return FXCollections.observableArrayList(temp);    
+  }
+  
+  /**
+   * metszet
+   * 
+   * @param list1
+   * @param list2
+   * @return list1 és 2 metszete
+   */  
+  public ObservableList<Employee> pt10r(ObservableList<Employee> list1, ObservableList<Employee> list2) {
+    Set<Employee> temp = new HashSet<>();
+    return pt10r(list1,list2,0,0,temp);
+  }
+
+  /**
+   * 
+   * @param list1
+   * @param list2
+   * @param n egyik listában i-nél
+   * @param o másikban o-nál tart
+   * @param temp a metszet
+   * @return 
+   */
+  private ObservableList<Employee> pt10r(ObservableList<Employee> list1, ObservableList<Employee> list2, int n, int o, Set<Employee> temp) {
+    if (n==list1.size()) return FXCollections.observableArrayList(temp);
+    if (o==list2.size()) return pt10r(list1,list2,n+1,0,temp);
+    if (list1.get(n).equals(list2.get(o))) {
+      temp.add(list1.get(n));
+      return pt10r(list1,list2,n+1,0,temp);
+    } else return pt10r(list1,list2,n,o+1,temp);
+    
+    
+  }
+  
   
   
   

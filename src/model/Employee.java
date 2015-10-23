@@ -21,6 +21,7 @@ public class Employee {
   }
   
   
+  
   public String toString() {
     //return empName;
     return toCSVString();
@@ -49,5 +50,46 @@ public class Employee {
   public int getManagerId() {
     return managerId;
   }
+  
+  /**
+   * megnöveli a fizetest
+   * (masolas tetelhez)
+   * 
+   * @param e a forrás empl.
+   * @return egy új megemelt fiz.-ű dolgozó
+   */
+  
+  public static Employee raiseSalary(Employee e) {
+    return new Employee(e.empId, e.empName, (int)(e.empSalary*1.1), e.depId, e.managerId);
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 97 * hash + this.empId;
+    return hash;
+  }
+
+  /**
+   * tfh empid unique
+   * 
+   * @param obj
+   * @return 
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Employee other = (Employee) obj;
+    if (this.empId != other.empId) {
+      return false;
+    }
+    return true;
+  }
+  
   
 }
